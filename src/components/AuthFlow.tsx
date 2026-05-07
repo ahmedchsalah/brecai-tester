@@ -99,7 +99,7 @@ export default function AuthFlow({ onSuccess }: Props) {
 
           {/* Step indicator */}
           <div className="step-indicator">
-            {['Credentials', 'Send OTP', 'Verify OTP'].map((label, i) => (
+            {['Credentials', 'Send OTP', 'Verify OTP'].map((_label, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'center', flex: i < 2 ? '1' : 'unset' }}>
                 <div className={`step-dot ${i === stepIndex ? 'active' : i < stepIndex ? 'done' : ''}`}>
                   {i < stepIndex ? '✓' : i + 1}

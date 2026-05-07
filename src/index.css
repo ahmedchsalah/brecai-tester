@@ -341,12 +341,13 @@ textarea.input { resize: vertical; font-family: var(--mono); font-size: 12px; mi
 
 /* ── OTP inputs ───────────────────────────────────────────────────────────── */
 .otp-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
 }
 .otp-cell {
-  aspect-ratio: 1;
+  width: 44px;
+  height: 52px;
   text-align: center;
   background: var(--bg-elevated);
   border: 1px solid var(--border);

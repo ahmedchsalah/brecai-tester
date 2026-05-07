@@ -5,7 +5,7 @@ export interface User {
   email: string;
   phone_number: string | null;
   is_active: boolean;
-  roles: string[];
+  role: string;
   organization: {
     id: number;
     name: string;

@@ -41,7 +41,7 @@ export default function Dashboard({ user, onLogout }: Props) {
   const roleColor: Record<string, string> = {
     admin: '#ef4444', org_manager: '#22c55e', doctor: '#3b82f6', instructor: '#a855f7',
   };
-  const userRole = user.roles[0] ?? 'user';
+  const userRole = user.role ?? 'user';
 
   return (
     <div className="app-shell">

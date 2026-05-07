@@ -133,7 +133,8 @@ export default function AuthFlow({ onSuccess }: Props) {
     if (userData && typeof userData === 'object' && 'id' in userData) {
       onSuccess(userData as User);
     } else {
-      setError(`Unexpected response shape — no user returned. Raw: ${JSON.stringify(res.data)}`);
+      const debugRaw = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+      setError(`Unexpected response shape — no user returned. Raw: ${debugRaw || 'Empty Response'}`);
     }
   };
 

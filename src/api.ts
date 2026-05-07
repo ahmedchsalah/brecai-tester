@@ -53,11 +53,14 @@ export async function apiRequest<T = unknown>(
 
     const duration = Math.round(performance.now() - start);
     let data: T | null = null;
+    let text = '';
     try {
-      const text = await res.text();
+      text = await res.text();
       if (text) data = JSON.parse(text) as T;
     } catch {
-      /* non-JSON body */
+      // If parsing fails, we store the raw text in data (as any) so the 
+      // UI can display the "Raw: ..." error correctly.
+      data = text as unknown as T;
     }
     return { data, status: res.status, ok: res.ok, duration };
   } catch (e: unknown) {

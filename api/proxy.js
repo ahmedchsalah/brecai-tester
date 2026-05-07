@@ -34,6 +34,7 @@ const HOP_BY_HOP = new Set([
   'host', 'connection', 'keep-alive', 'proxy-authenticate',
   'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade',
   'content-length', // fetch will recalculate this for the buffered body
+  'content-encoding', // fetch handles decompression; forwarding this header causes browser decoding errors
 ]);
 
 export default async function handler(req, res) {

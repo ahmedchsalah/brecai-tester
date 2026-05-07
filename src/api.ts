@@ -1,3 +1,20 @@
+/**
+ * api.ts — centralised fetch wrapper
+ *
+ * In production (Vercel) every request goes through /api-proxy/* which is a
+ * same-origin serverless function that forwards the call to Laravel Cloud.
+ * This eliminates the __cf_bm / SameSite cookie rejections and CORS issues
+ * that occur when the browser talks directly to laravel.cloud.
+ *
+ * In local dev (vite) the proxy path also works because vite.config.ts
+ * forwards /api-proxy to the same backend URL.
+ */
+
+/**
+ * PROXY_BASE is always same-origin → no CORS, no cross-domain cookie issues.
+ * BASE_URL is kept for display purposes only (URL bar, cURL copy).
+ */
+export const PROXY_BASE = '/api-proxy';
 export const BASE_URL =
   import.meta.env.VITE_API_URL ??
   'https://breast-cancer-detection-backend-main-p7c9cg.laravel.cloud/api';
@@ -26,9 +43,10 @@ export async function apiRequest<T = unknown>(
       headers['Content-Type'] = 'application/json';
     }
 
-    const res = await fetch(`${BASE_URL}${path}`, {
+    // Route through same-origin proxy — fixes __cf_bm / SameSite rejections
+    const res = await fetch(`${PROXY_BASE}${path}`, {
       method,
-      credentials: 'include',   // sends the HttpOnly auth_token cookie
+      credentials: 'include',   // sends cookies to same-origin proxy
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });

@@ -41,9 +41,12 @@ export default function AuthFlow({ onSuccess }: Props) {
     }
   }, [mode, role]);
 
-  // Ensure CSRF cookie is set before state-changing requests
+  // Ensure CSRF cookie is set before state-changing requests.
+  // /sanctum/csrf-cookie lives at the Laravel root (outside /api), so the
+  // proxy strips the /api-proxy prefix and appends to the backend base URL.
+  // We use a dedicated path that the proxy forwards to the root endpoint.
   const initCsrf = async () => {
-    await apiRequest('GET', '/../sanctum/csrf-cookie');
+    await apiRequest('GET', '/sanctum/csrf-cookie');
   };
 
   // ── Step 1: Login / Register ─────────────────────────────────────────────

@@ -112,9 +112,11 @@ export default function AuthFlow({ onSuccess }: Props) {
       return;
     }
 
+    const raw = res.data as any;
+
     // Status 202 = Awaiting approval (Backend logic for Doctors)
     if (res.status === 202) {
-      setInfo(res.data?.message || 'Identity verified. Awaiting approval.');
+      setInfo(raw?.message || 'Identity verified. Awaiting approval.');
       setStep('credentials');
       setMode('login');
       return;
@@ -122,7 +124,6 @@ export default function AuthFlow({ onSuccess }: Props) {
 
     // The backend returns { message, user: { data: { id, ... } } }.
     // We handle various potential nesting levels for maximum robustness.
-    const raw = res.data as any;
     const userData = 
       raw?.user?.data ??  // Standard: { user: { data: { ... } } }
       raw?.user ??       // Fallback: { user: { ... } }

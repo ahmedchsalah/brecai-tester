@@ -8,11 +8,15 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
 
-  // On mount — silently try /auth/me to restore session from cookie
+  // On mount — silently try /auth/me to restore session from cookie.
+  // Laravel's JsonResource might wrap the response in a "data" key.
   useEffect(() => {
     (async () => {
-      const res = await apiRequest<User>('GET', '/auth/me');
-      if (res.ok && res.data) setUser(res.data as User);
+      const res = await apiRequest<any>('GET', '/auth/me');
+      if (res.ok && res.data) {
+        const userData = res.data.data ?? res.data;
+        if (userData && userData.id) setUser(userData as User);
+      }
       setChecking(false);
     })();
   }, []);

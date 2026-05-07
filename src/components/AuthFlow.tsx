@@ -103,7 +103,7 @@ export default function AuthFlow({ onSuccess }: Props) {
     const code = otp.join('');
     if (code.length !== 6) { setError('Enter all 6 digits.'); return; }
     setError(''); setLoading(true);
-    const res = await apiRequest<{ user: User; message: string }>(
+    const res = await apiRequest<{ user: User; message: string } | User>(
       'POST', `/auth/verify-otp?context=${mode}`, { email, otp: code }
     );
     setLoading(false);
@@ -111,7 +111,7 @@ export default function AuthFlow({ onSuccess }: Props) {
       setError((res.data as { message?: string })?.message ?? `Error ${res.status}`);
       return;
     }
-    
+
     // Status 202 = Awaiting approval (Backend logic for Doctors)
     if (res.status === 202) {
       setInfo(res.data?.message || 'Identity verified. Awaiting approval.');
@@ -120,8 +120,20 @@ export default function AuthFlow({ onSuccess }: Props) {
       return;
     }
 
-    if (res.data?.user) onSuccess(res.data.user);
-    else setError('Unexpected response — no user object returned.');
+    // The backend returns { message, user: { data: { id, ... } } }.
+    // We handle various potential nesting levels for maximum robustness.
+    const raw = res.data as any;
+    const userData = 
+      raw?.user?.data ??  // Standard: { user: { data: { ... } } }
+      raw?.user ??       // Fallback: { user: { ... } }
+      raw?.data ??       // Fallback: { data: { ... } }
+      raw;               // Fallback: { ... }
+
+    if (userData && typeof userData === 'object' && 'id' in userData) {
+      onSuccess(userData as User);
+    } else {
+      setError(`Unexpected response shape — no user returned. Raw: ${JSON.stringify(res.data)}`);
+    }
   };
 
   // ── OTP input helpers ────────────────────────────────────────────────────

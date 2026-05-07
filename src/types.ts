@@ -1,16 +1,21 @@
-// ── User ─────────────────────────────────────────────────────────────────────
+// ── User (mirrors UserResource::toArray() exactly) ──────────────────────────
 export interface User {
   id: number;
   name: string;
   email: string;
-  phone_number: string | null;
+  role: string;               // getRoleNames()->first()
   is_active: boolean;
-  role: string;
+  joined_at: string;          // created_at formatted
   organization: {
     id: number;
     name: string;
     type: string;
+    address: string | null;
+    latitude: number | null;
+    longitude: number | null;
     status: string;
+    subscription_status: string | null;
+    plan_id: number | null;
   } | null;
 }
 

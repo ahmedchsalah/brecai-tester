@@ -33,10 +33,13 @@ function buildUpstreamUrl(reqUrl) {
 const HOP_BY_HOP = new Set([
   'host', 'connection', 'keep-alive', 'proxy-authenticate',
   'proxy-authorization', 'te', 'trailers', 'transfer-encoding', 'upgrade',
+  'content-length', // fetch will recalculate this for the buffered body
 ]);
 
 export default async function handler(req, res) {
   const upstreamUrl = buildUpstreamUrl(req.url);
+  
+  console.log(`[Proxy] ${req.method} ${req.url} -> ${upstreamUrl}`);
 
   // ── Forward safe request headers ────────────────────────────────────────
   const forwardHeaders = {};
@@ -69,9 +72,12 @@ export default async function handler(req, res) {
       redirect: 'manual', // let the client follow redirects itself
     });
   } catch (err) {
+    console.error(`[Proxy] Fetch failed: ${err}`);
     res.status(502).json({ error: 'Proxy fetch failed', detail: String(err) });
     return;
   }
+
+  console.log(`[Proxy] Upstream response: ${upstreamRes.status}`);
 
   // ── Forward response headers ─────────────────────────────────────────────
   for (const [key, value] of upstreamRes.headers.entries()) {
@@ -91,6 +97,7 @@ export default async function handler(req, res) {
         + '; SameSite=Lax'                    // re-add appropriate policy
     );
     res.setHeader('Set-Cookie', rewritten);
+    console.log(`[Proxy] Rewrote ${rewritten.length} cookies`);
   }
 
   res.status(upstreamRes.status);

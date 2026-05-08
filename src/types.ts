@@ -162,6 +162,16 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
       { id: 'admin-users-show', method: 'GET', path: '/admin/users/:id', label: 'Show User', description: 'Get a single user.', pathParams: [{ key: 'id', example: '1' }] },
       { id: 'admin-users-activate', method: 'POST', path: '/admin/users/:id/activate', label: 'Activate User', description: 'Activate a user account.', pathParams: [{ key: 'id', example: '1' }] },
       { id: 'admin-users-deactivate', method: 'POST', path: '/admin/users/:id/deactivate', label: 'Deactivate User', description: 'Deactivate a user account.', pathParams: [{ key: 'id', example: '1' }] },
+      {
+        id: 'admin-users-create', method: 'POST', path: '/admin/users', label: 'Create User', description: 'Admin: Create and activate a user directly.',
+        defaultBody: { name: 'Dr. New User', email: 'new@doctor.dz', password: 'password123', role: 'doctor', organization_id: 1 },
+      },
+      {
+        id: 'admin-users-update', method: 'PUT', path: '/admin/users/:id', label: 'Update User', description: 'Update user profile and role.',
+        pathParams: [{ key: 'id', example: '1' }],
+        defaultBody: { name: 'Updated Name', role: 'admin' },
+      },
+      { id: 'admin-users-delete', method: 'DELETE', path: '/admin/users/:id', label: 'Delete User', description: 'Permanently remove a user account.', pathParams: [{ key: 'id', example: '1' }] },
     ],
   },
 
@@ -267,10 +277,19 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
         id: 'doc-exams-create', method: 'POST', path: '/doctor/examinations', label: 'Create Examination', description: 'Start a new examination.',
         defaultBody: { patient_id: 1, notes: 'Initial examination' },
       },
+      {
+        id: 'doc-exams-update', method: 'PUT', path: '/doctor/examinations/:id', label: 'Update Examination', description: 'Update examination notes or metadata.',
+        pathParams: [{ key: 'id', example: '1' }],
+        defaultBody: { notes: 'Updated notes...' },
+      },
       { id: 'doc-exams-submit', method: 'POST', path: '/doctor/examinations/:id/submit', label: 'Submit Examination', description: 'Submit examination for review.', pathParams: [{ key: 'id', example: '1' }] },
       { id: 'doc-exams-conclude', method: 'POST', path: '/doctor/examinations/:id/conclude', label: 'Conclude Examination', description: 'Mark examination as concluded.', pathParams: [{ key: 'id', example: '1' }] },
       { id: 'doc-wsi', method: 'GET', path: '/doctor/wsi-uploads', label: 'List WSI Uploads', description: 'Whole-slide image uploads.' },
       { id: 'doc-wsi-show', method: 'GET', path: '/doctor/wsi-uploads/:id', label: 'Show WSI Upload', description: 'Single WSI upload details.', pathParams: [{ key: 'id', example: '1' }] },
+      {
+        id: 'doc-wsi-create', method: 'POST', path: '/doctor/wsi-uploads', label: 'Create WSI Upload', description: 'Register a new WSI file path.',
+        defaultBody: { examination_id: 1, file_path: 'wsis/slide_001.svs', original_filename: 'biopsy_A.svs' },
+      },
       { id: 'doc-predictions', method: 'GET', path: '/doctor/predictions', label: 'List Predictions', description: 'All AI predictions for this doctor.' },
       { id: 'doc-predictions-show', method: 'GET', path: '/doctor/predictions/:id', label: 'Show Prediction', description: 'Single prediction result.', pathParams: [{ key: 'id', example: '1' }] },
       { id: 'doc-predictions-status', method: 'GET', path: '/doctor/predictions/:id/status', label: 'Prediction Status', description: 'Poll prediction job status.', pathParams: [{ key: 'id', example: '1' }] },
@@ -286,7 +305,17 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
         id: 'doc-reports-create', method: 'POST', path: '/doctor/reports', label: 'Create Report', description: 'Create a new clinical report.',
         defaultBody: { examination_id: 1, title: 'Pathology Report', content: 'Findings...' },
       },
+      {
+        id: 'doc-reports-update', method: 'PUT', path: '/doctor/reports/:id', label: 'Update Report', description: 'Edit report title or content before finalizing.',
+        pathParams: [{ key: 'id', example: '1' }],
+        defaultBody: { title: 'Updated Report', content: 'Revised findings...' },
+      },
       { id: 'doc-reports-finalize', method: 'POST', path: '/doctor/reports/:id/finalize', label: 'Finalize Report', description: 'Lock report as final.', pathParams: [{ key: 'id', example: '1' }] },
+      {
+        id: 'doc-reports-attach', method: 'POST', path: '/doctor/reports/:id/attach-file', label: 'Attach File', description: 'Attach a file to the report.',
+        pathParams: [{ key: 'id', example: '1' }],
+        defaultBody: { file_path: 'attachments/extra_info.pdf', file_type: 'pdf' },
+      },
     ],
   },
 
@@ -305,6 +334,11 @@ export const ENDPOINT_GROUPS: EndpointGroup[] = [
       {
         id: 'fl-models-create', method: 'POST', path: '/fl/models', label: 'Create FL Model', description: 'Register a new FL model.',
         defaultBody: { name: 'BrCa-FL-v1', version: '1.0.0', file_path: 'fl/model_v1.pt' },
+      },
+      {
+        id: 'fl-models-update', method: 'PUT', path: '/fl/models/:id', label: 'Update FL Model', description: 'Update FL model metadata.',
+        pathParams: [{ key: 'id', example: '1' }],
+        defaultBody: { name: 'BrCa-FL-v1-Updated', version: '1.0.1' },
       },
       { id: 'fl-rounds', method: 'GET', path: '/fl/rounds', label: 'List FL Rounds', description: 'All federated learning rounds.' },
       { id: 'fl-rounds-show', method: 'GET', path: '/fl/rounds/:id', label: 'Show FL Round', description: 'Single FL round details.', pathParams: [{ key: 'id', example: '1' }] },

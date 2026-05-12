@@ -50,7 +50,7 @@ function StepIndicator({ current }: { current: number }) {
   );
 }
 
-export default function PredictionWizard({ _user }: { user: User }) {
+export default function PredictionWizard({ user }: { user: User }) {
   const [step, setStep]         = useState(0);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selPatient, setSelPatient] = useState<Patient | null>(null);
@@ -114,7 +114,7 @@ export default function PredictionWizard({ _user }: { user: User }) {
 
   const runPrediction = async () => {
     if (!exam || !wsi) return;
-    setLoading(true); setError(''); setProgress(0); setStatus('Dispatching AI prediction job…');
+    setLoading(true); setError(''); setProgress(0); setStatus(`Dispatching AI prediction job for ${user.name}...`);
 
     // Get active model
     const mr = await apiRequest<any>('GET', '/admin/ai-models');

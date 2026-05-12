@@ -164,12 +164,35 @@ export default function Dashboard({ user, onLogout }: Props) {
   const userRole = user.role ?? 'user';
   const rc = roleColor[userRole] ?? '#4f7fff';
 
-  // Automated feature: if org manager and no active sub, auto-take to payment
+  // Automated feature: if org manager and pending, show intermediate page
+  const isPending = userRole === 'org_manager' && user.organization?.status === 'pending';
+
+  // Automated feature: if org manager, approved, and no active sub, auto-take to payment
   useEffect(() => {
-    if (userRole === 'org_manager' && !user.organization?.subscription_status) {
+    if (userRole === 'org_manager' && user.organization?.status === 'approved' && !user.organization?.subscription_status) {
       setView('payment');
     }
-  }, [userRole, user.organization?.subscription_status]);
+  }, [userRole, user.organization?.status, user.organization?.subscription_status]);
+
+  if (isPending) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)', padding: 20 }}>
+        <div style={{ maxWidth: 500, width: '100%', background: 'var(--bg-card)', borderRadius: 24, padding: 40, border: '1px solid var(--border)', textAlign: 'center' }}>
+          <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(245, 158, 11, 0.1)', color: 'var(--warning)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, margin: '0 auto 24px' }}>⏳</div>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>Account Under Review</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.6, marginBottom: 32 }}>
+            Your organization, <strong>{user.organization?.name}</strong>, is currently being reviewed by our administrative team.
+            You will receive an email once your account has been approved.
+          </p>
+          <div style={{ padding: '16px 20px', background: 'var(--bg-elevated)', borderRadius: 16, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--warning)', boxShadow: '0 0 10px var(--warning)' }} />
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Status: Pending Administrative Approval</span>
+          </div>
+          <button onClick={onLogout} className="btn btn-danger" style={{ width: '100%' }}>Logout</button>
+        </div>
+      </div>
+    );
+  }
 
   const filteredGroups = ENDPOINT_GROUPS.map(group => ({
     ...group,

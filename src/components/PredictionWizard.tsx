@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import type { User } from '../types';
 import { apiRequest } from '../api';
 
-type Step = 'patient' | 'wsi' | 'predict' | 'results';
 
 interface Patient { id: number; patient_identifier: string; name?: string; age?: number; }
 interface Examination { id: number; status: string; patient_id: number; }
@@ -51,7 +50,7 @@ function StepIndicator({ current }: { current: number }) {
   );
 }
 
-export default function PredictionWizard({ user }: { user: User }) {
+export default function PredictionWizard({ _user }: { user: User }) {
   const [step, setStep]         = useState(0);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selPatient, setSelPatient] = useState<Patient | null>(null);
@@ -107,7 +106,7 @@ export default function PredictionWizard({ user }: { user: User }) {
     const w: WsiUpload = wr.data?.data ?? wr.data;
     setWsi(w);
     setProgress(50); setStatus('Extracting CONCH features (simulated)…');
-    const xr = await apiRequest<any>('POST', `/doctor/wsi-uploads/${w.id}/extract-features?simulate=1`, {});
+    await apiRequest<any>('POST', `/doctor/wsi-uploads/${w.id}/extract-features?simulate=1`, {});
     setProgress(70); setStatus('Features ready. Proceeding to prediction step…');
     setLoading(false);
     setStep(2);

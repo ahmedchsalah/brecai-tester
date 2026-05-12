@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { ENDPOINT_GROUPS } from '../types';
 import type { User, EndpointGroup, Endpoint } from '../types';
 import EndpointPanel from './EndpointPanel';

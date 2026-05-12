@@ -26,12 +26,25 @@ export default function PaymentWizard({ user, onDone }: { user: User; onDone: ()
 
   useEffect(() => {
     (async () => {
-      // Use the correct route from PaymentController: /org-manager/plans
-      const res = await apiRequest<Plan[]>('GET', '/org-manager/plans');
-      if (res.ok && res.data) {
-        setPlans(Array.isArray(res.data) ? res.data : (res.data as any).data || []);
+      try {
+        const res = await apiRequest<any>('GET', '/org-manager/plans');
+        if (res.ok && res.data) {
+          // Standardise data extraction from Laravel's JsonResource or direct arrays
+          const raw = res.data.data ?? res.data;
+          if (Array.isArray(raw)) {
+            setPlans(raw);
+          } else {
+            console.error('Expected array of plans, got:', raw);
+            setError('Received invalid data format from server.');
+          }
+        } else {
+          setError(res.error || 'Failed to connect to the billing server.');
+        }
+      } catch (err) {
+        setError('A network error occurred while fetching plans.');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     })();
   }, []);
 
@@ -120,18 +133,35 @@ export default function PaymentWizard({ user, onDone }: { user: User; onDone: ()
                 </div>
               );
             })}
+            
+            {plans.length === 0 && !error && (
+              <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
+                No subscription plans are currently available.
+              </div>
+            )}
+
+            {error && (
+              <div style={{ maxWidth: 400, padding: 24, background: 'rgba(239, 68, 68, 0.05)', border: '1px solid var(--danger)', borderRadius: 20, textAlign: 'center' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+                <div style={{ color: 'var(--danger)', fontWeight: 700, marginBottom: 8 }}>Unable to load plans</div>
+                <div style={{ color: 'var(--text-secondary)', fontSize: 13, marginBottom: 20 }}>{error}</div>
+                <button className="btn btn-sm" onClick={() => window.location.reload()}>Try Again</button>
+              </div>
+            )}
           </div>
           
-          <div style={{ marginTop: 48, display: 'flex', justifyContent: 'center' }}>
-            <button 
-              className="btn btn-primary" 
-              style={{ padding: '16px 48px', fontSize: 16, borderRadius: 16, height: 'auto', opacity: selPlan ? 1 : 0.5 }} 
-              disabled={!selPlan} 
-              onClick={() => setStep('select-duration')}
-            >
-              Select {selPlan?.name || 'a Plan'} →
-            </button>
-          </div>
+          {plans.length > 0 && (
+            <div style={{ marginTop: 48, display: 'flex', justifyContent: 'center' }}>
+              <button 
+                className="btn btn-primary" 
+                style={{ padding: '16px 48px', fontSize: 16, borderRadius: 16, height: 'auto', opacity: selPlan ? 1 : 0.5 }} 
+                disabled={!selPlan} 
+                onClick={() => setStep('select-duration')}
+              >
+                Select {selPlan?.name || 'a Plan'} →
+              </button>
+            </div>
+          )}
         </>
       )}
 

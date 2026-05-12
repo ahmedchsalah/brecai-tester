@@ -164,35 +164,37 @@ export default function Dashboard({ user, onLogout }: Props) {
   const userRole = user.role ?? 'user';
   const rc = roleColor[userRole] ?? '#4f7fff';
 
-  // Automated feature: if org manager and pending, show intermediate page
-  const isPending = userRole === 'org_manager' && user.organization?.status === 'pending';
+  // 🛡️ CRITICAL GATE: If Org Manager and org is NOT active/approved, block EVERYTHING.
+  // We use both 'status' and 'is_active' (user level) to be safe.
+  const isPendingOrg = userRole === 'org_manager' && 
+                       (user.organization?.status === 'pending' || !user.organization?.status);
 
-  // Automated feature: if org manager, approved, and no active sub, auto-take to payment
-  useEffect(() => {
-    if (userRole === 'org_manager' && user.organization?.status === 'approved' && !user.organization?.subscription_status) {
-      setView('payment');
-    }
-  }, [userRole, user.organization?.status, user.organization?.subscription_status]);
-
-  if (isPending) {
+  if (isPendingOrg) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)', padding: 20 }}>
-        <div style={{ maxWidth: 500, width: '100%', background: 'var(--bg-card)', borderRadius: 24, padding: 40, border: '1px solid var(--border)', textAlign: 'center' }}>
-          <div style={{ width: 80, height: 80, borderRadius: 24, background: 'rgba(245, 158, 11, 0.1)', color: 'var(--warning)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40, margin: '0 auto 24px' }}>⏳</div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 12 }}>Account Under Review</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.6, marginBottom: 32 }}>
-            Your organization, <strong>{user.organization?.name}</strong>, is currently being reviewed by our administrative team.
-            You will receive an email once your account has been approved.
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0c', padding: 20 }}>
+        <div style={{ maxWidth: 500, width: '100%', background: '#121214', borderRadius: 28, padding: 48, border: '1px solid #222', textAlign: 'center', boxShadow: '0 24px 48px rgba(0,0,0,0.4)' }}>
+          <div style={{ width: 88, height: 88, borderRadius: 32, background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, margin: '0 auto 28px' }}>⏳</div>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 14, letterSpacing: '-0.5px' }}>Account Pending Approval</h1>
+          <p style={{ color: '#999', fontSize: 16, lineHeight: 1.6, marginBottom: 36 }}>
+            The organization <strong>{user.organization?.name}</strong> is currently undergoing administrative review. 
+            Access to the platform is restricted until your application is approved.
           </p>
-          <div style={{ padding: '16px 20px', background: 'var(--bg-elevated)', borderRadius: 16, border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-            <div style={{ width: 10, height: 10, borderRadius: '50%', background: 'var(--warning)', boxShadow: '0 0 10px var(--warning)' }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Status: Pending Administrative Approval</span>
+          <div style={{ padding: '18px 24px', background: '#1a1a1c', borderRadius: 16, border: '1px solid #333', display: 'flex', alignItems: 'center', gap: 14, marginBottom: 36 }}>
+            <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#f59e0b', boxShadow: '0 0 12px #f59e0b' }} />
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#eee' }}>Status: Awaiting Verification</span>
           </div>
-          <button onClick={onLogout} className="btn btn-danger" style={{ width: '100%' }}>Logout</button>
+          <button onClick={onLogout} className="btn btn-danger" style={{ width: '100%', height: 52, borderRadius: 16, fontWeight: 700 }}>Logout</button>
         </div>
       </div>
     );
   }
+
+  // Automated feature: if org manager, approved, and no active sub, auto-take to payment
+  useEffect(() => {
+    if (userRole === 'org_manager' && user.organization?.status === 'active' && !user.organization?.subscription_status) {
+      setView('payment');
+    }
+  }, [userRole, user.organization?.status, user.organization?.subscription_status]);
 
   const filteredGroups = ENDPOINT_GROUPS.map(group => ({
     ...group,

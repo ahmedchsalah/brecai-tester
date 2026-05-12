@@ -62,11 +62,11 @@ export default function PaymentWizard({ user, onDone }: { user: User; onDone: ()
     </div>
   );
 
-  const cardStyle = (active: boolean, color: string) => ({
+  const cardStyle = (active: boolean, color: string): React.CSSProperties => ({
     background: active ? `${color}11` : 'var(--bg-card)',
     border: active ? `2px solid ${color}` : '1px solid var(--border)',
     borderRadius: 24, padding: 32, cursor: 'pointer', transition: 'all 0.2s', flex: 1, minWidth: 280,
-    display: 'flex', flexDirection: 'column', gap: 16,
+    display: 'flex', flexDirection: 'column' as const, gap: 16,
     boxShadow: active ? `0 12px 32px ${color}22` : 'none',
     transform: active ? 'translateY(-4px)' : 'none',
   });
@@ -185,18 +185,18 @@ export default function PaymentWizard({ user, onDone }: { user: User; onDone: ()
       )}
 
       {step === 'checkout' && (
-        <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-          <div style={{ width: 88, height: 88, borderRadius: 32, background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, margin: '0 auto 32px', boxShadow: '0 16px 32px rgba(245, 158, 11, 0.2)' }}>🏦</div>
-          <h2 style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Complete Payment</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 16, maxWidth: 480, margin: '0 auto 40px', lineHeight: 1.6 }}>
-            We've opened the secure Chargily payment gateway in a new tab. Please complete the transaction there to activate your subscription.
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 320, margin: '0 auto' }}>
-            <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ textDecoration: 'none', background: '#f59e0b', color: '#fff', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 16 }}>Open Payment Page ↗</a>
-            <button className="btn" style={{ height: 52, borderRadius: 16, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} onClick={() => window.location.reload()}>🔄 I have completed payment</button>
-            <button className="btn" style={{ background: 'transparent', color: 'var(--text-muted)' }} onClick={() => setStep('select-duration')}>Cancel</button>
+          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+            <div style={{ width: 88, height: 88, borderRadius: 32, background: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, margin: '0 auto 32px', boxShadow: '0 16px 32px rgba(245, 158, 11, 0.2)' }}>🏦</div>
+            <h2 style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>Complete Payment</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 16, maxWidth: 480, margin: '0 auto 40px', lineHeight: 1.6 }}>
+              Hello <strong>{user.name}</strong>, we've opened the secure Chargily payment gateway in a new tab. Please complete the transaction there to activate your subscription.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 320, margin: '0 auto' }}>
+              <a href={checkoutUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ textDecoration: 'none', background: '#f59e0b', color: '#fff', height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 16 }}>Open Payment Page ↗</a>
+              <button className="btn" style={{ height: 52, borderRadius: 16, background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} onClick={() => onDone()}>🔄 I have completed payment</button>
+              <button className="btn" style={{ background: 'transparent', color: 'var(--text-muted)' }} onClick={() => setStep('select-duration')}>Cancel</button>
+            </div>
           </div>
-        </div>
       )}
     </div>
   );

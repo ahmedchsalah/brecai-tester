@@ -27,7 +27,7 @@ export default function PaymentWizard({ user, onDone }: { user: User; onDone: ()
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiRequest<any>('GET', '/org-manager/plans');
+        const res = await apiRequest<any>('GET', '/org/plans');
         if (res.ok && res.data) {
           // Standardise data extraction from Laravel's JsonResource or direct arrays
           const raw = res.data.data ?? res.data;
@@ -53,7 +53,7 @@ export default function PaymentWizard({ user, onDone }: { user: User; onDone: ()
     setCheckingOut(true);
     setError('');
     // Use the correct route from PaymentController: /org-manager/subscribe
-    const res = await apiRequest<{ checkout_url: string }>('POST', '/org-manager/subscribe', {
+    const res = await apiRequest<{ checkout_url: string }>('POST', '/org/subscribe', {
       plan_id: selPlan.id,
       duration_months: months,
     });

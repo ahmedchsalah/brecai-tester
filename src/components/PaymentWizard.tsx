@@ -63,7 +63,13 @@ export default function PaymentWizard({ user, onDone }: { user: User; onDone: ()
       // Automatically open in new tab
       window.open(res.data.checkout_url, '_blank');
     } else {
-      setError(res.error || (res.data as any)?.message || 'Failed to create checkout session.');
+      // Show the real error from backend (includes Chargily's validation message)
+      const errMsg =
+        res.error ||
+        (res.data as any)?.error ||
+        (res.data as any)?.message ||
+        'Failed to create checkout session.';
+      setError(errMsg);
     }
     setCheckingOut(false);
   };

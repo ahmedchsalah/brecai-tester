@@ -47,7 +47,6 @@ export async function apiRequest<T = unknown>(
     const url = `${PROXY_BASE}${path}`;
     const res = await fetch(url, {
       method,
-      credentials: 'include',   // sends cookies to same-origin proxy
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });

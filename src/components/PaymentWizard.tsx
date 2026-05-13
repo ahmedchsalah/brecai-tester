@@ -23,6 +23,27 @@ export default function PaymentWizard({ user, onDone }: { user: User; onDone: ()
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutUrl, setCheckoutUrl] = useState('');
   const [error, setError] = useState('');
+  const [isPolling, setIsPolling] = useState(false);
+
+  // Auto-polling for status after redirect
+  useEffect(() => {
+    let interval: any;
+    if (step === 'checkout' && !isPolling) {
+      setIsPolling(true);
+      interval = setInterval(async () => {
+        try {
+          const res = await apiRequest<{ status: string }>('GET', '/org/subscription-status');
+          if (res.ok && res.data?.status === 'active') {
+            clearInterval(interval);
+            onDone();
+          }
+        } catch (e) {
+          console.error('Polling error:', e);
+        }
+      }, 3000);
+    }
+    return () => clearInterval(interval);
+  }, [step, onDone]);
 
   useEffect(() => {
     (async () => {

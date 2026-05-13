@@ -33,9 +33,17 @@ export default function App() {
     );
   }
 
+  const refreshUser = async () => {
+    const res = await apiRequest<any>('GET', '/auth/me');
+    if (res.ok && res.data) {
+      const userData = res.data.data ?? res.data;
+      if (userData && userData.id) setUser(userData as User);
+    }
+  };
+
   if (!user) {
     return <AuthFlow onSuccess={u => setUser(u)} />;
   }
 
-  return <Dashboard user={user} onLogout={() => setUser(null)} />;
+  return <Dashboard user={user} onLogout={() => setUser(null)} onRefresh={refreshUser} />;
 }

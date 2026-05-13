@@ -9,6 +9,7 @@ import PredictionWizard from './PredictionWizard';
 interface Props {
   user: User;
   onLogout: () => void;
+  onRefresh: () => Promise<void>;
 }
 
 const roleColor: Record<string, string> = {
@@ -153,7 +154,7 @@ function KpiSection({ role }: { role: string }) {
 }
 
 // ── Main Dashboard ────────────────────────────────────────────────────────────
-export default function Dashboard({ user, onLogout }: Props) {
+export default function Dashboard({ user, onLogout, onRefresh }: Props) {
   const [view, setView] = useState<'overview' | 'endpoints' | 'payment' | 'prediction'>('overview');
   const [selectedGroup, setSelectedGroup] = useState<EndpointGroup>(ENDPOINT_GROUPS[0]);
   const [selectedEndpoint, setSelectedEndpoint] = useState<Endpoint>(ENDPOINT_GROUPS[0].endpoints[0]);
@@ -339,7 +340,10 @@ export default function Dashboard({ user, onLogout }: Props) {
         {view === 'payment' && (
           <div style={{ padding: '24px 28px' }}>
             <button onClick={() => setView('overview')} className="btn btn-ghost btn-sm" style={{ marginBottom: 16 }}>← Back</button>
-            <PaymentWizard user={user} onDone={() => setView('overview')} />
+            <PaymentWizard user={user} onDone={async () => {
+              await onRefresh();
+              setView('overview');
+            }} />
           </div>
         )}
 

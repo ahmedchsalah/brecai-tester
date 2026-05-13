@@ -44,7 +44,8 @@ export async function apiRequest<T = unknown>(
     }
 
     // Route through same-origin proxy — fixes __cf_bm / SameSite rejections
-    const res = await fetch(`${PROXY_BASE}${path}`, {
+    const url = `${PROXY_BASE}${path}`;
+    const res = await fetch(url, {
       method,
       credentials: 'include',   // sends cookies to same-origin proxy
       headers,

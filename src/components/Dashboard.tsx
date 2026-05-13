@@ -191,10 +191,13 @@ export default function Dashboard({ user, onLogout }: Props) {
 
   // Automated feature: if org manager, approved, and no active sub, auto-take to payment
   useEffect(() => {
-    if (userRole === 'org_manager' && user.organization?.status === 'active' && !user.organization?.subscription_status) {
+    if (userRole === 'org_manager' && 
+        user.organization?.status === 'active' && 
+        user.organization?.subscription_status !== 'active' &&
+        view === 'overview') {
       setView('payment');
     }
-  }, [userRole, user.organization?.status, user.organization?.subscription_status]);
+  }, [userRole, user.organization?.status, user.organization?.subscription_status, view]);
 
   const filteredGroups = ENDPOINT_GROUPS.map(group => ({
     ...group,
@@ -222,7 +225,7 @@ export default function Dashboard({ user, onLogout }: Props) {
   const navItems = [
     { id: 'overview',   label: 'Overview',   icon: '📊' },
     { id: 'endpoints',  label: 'API Tester', icon: '⚡' },
-    ...(userRole === 'org_manager' ? [{ id: 'payment',   label: 'Payment Flow',   icon: '💳' }] : []),
+    ...(userRole === 'org_manager' && user.organization?.subscription_status !== 'active' ? [{ id: 'payment',   label: 'Payment Flow',   icon: '💳' }] : []),
     ...(userRole === 'doctor'      ? [{ id: 'prediction', label: 'Prediction Flow', icon: '🤖' }] : []),
   ];
 
@@ -326,7 +329,7 @@ export default function Dashboard({ user, onLogout }: Props) {
             <KpiSection role={userRole} />
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 12 }}>Quick Actions</div>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {userRole === 'org_manager' && <button id="qa-payment" className="btn btn-primary" onClick={() => setView('payment')}>💳 Subscribe</button>}
+              {userRole === 'org_manager' && user.organization?.subscription_status !== 'active' && <button id="qa-payment" className="btn btn-primary" onClick={() => setView('payment')}>💳 Subscribe</button>}
               {userRole === 'doctor' && <button id="qa-prediction" className="btn btn-primary" onClick={() => setView('prediction')}>🤖 AI Prediction</button>}
               <button id="qa-api" className="btn" style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)' }} onClick={() => setView('endpoints')}>⚡ API Tester</button>
             </div>
